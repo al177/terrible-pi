@@ -45,18 +45,10 @@ Some notes.
 
 sudo apt-get -y update && sudo apt-get -y upgrade
 			
-			You may have to reboot afterwards.
-
 		-Install the necessary packages:
 			
 sudo apt-get -y install libusb-1.0-0-dev nfs-kernel-server git \
 pdsh isc-dhcp-server iptables bridge-utils
-
-		-Enable things that need enabling:
-
-sudo systemctl enable isc-dhcp-server
-sudo systemctl enable rpcbind
-sudo systemctl enable nfs-kernel-server
 
 		-Build and install the USB hub tool:
 
@@ -89,13 +81,12 @@ git clone https://github.com/al177/terrible-pi.git
 
 sudo chown -R root:root /home/pi/terrible-pi/etc			
 sudo cp -a /home/pi/terrible-pi/etc/* /etc/.
+		
+		-Enable things that need enabling:
 
-		-Reboot the head node.
-
-		-SSH to the head node again. The config files copied over have
-			changed the hostname to "head".  So if you connected as
-			"raspberrypi.lan", "raspberrypi", or "raspberrypi.local" above,
-			use "head.lan", "head", or "head.local" when reconnecting.
+sudo systemctl enable isc-dhcp-server
+sudo systemctl enable rpcbind
+sudo systemctl enable nfs-kernel-server
 
 		-Create an NFS directory for the clients
 
@@ -104,6 +95,13 @@ sudo chown pi:pi /srv/pihome
 chmod 755 /srv/pihome
 mkdir /srv/pihome/.ssh
 chmod 700 /srv/pihome/.ssh
+
+		-Reboot the head node.
+
+		-SSH to the head node again. The config files copied over have
+			changed the hostname to "head".  So if you connected as
+			"raspberrypi.lan", "raspberrypi", or "raspberrypi.local" above,
+			use "head.lan", "head", or "head.local" when reconnecting.
 
 		-Make an empty passphrase SSH key so the head can automatically
 			connect to the nodes
@@ -114,9 +112,6 @@ chmod 600 /srv/pihome/.ssh/authorized_keys
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
 cp /srv/pihome/.ssh/terrible.rsa ~/.ssh/.
-
-
-		-Enable the DHCP server:
 
 
 -compute node image generation
