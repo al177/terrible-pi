@@ -1,0 +1,7 @@
+auto eth0
+
+allow-hotplug eth0
+iface eth0 inet manual
+        up ip link set eth0 up
+        up brctl addif br0 eth0
+

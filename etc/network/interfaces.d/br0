@@ -1,0 +1,6 @@
+auto br0
+iface br0 inet static
+        address 10.1.1.1
+        netmask 255.255.255.0
+        bridge_ports none
+        bridge_stp on

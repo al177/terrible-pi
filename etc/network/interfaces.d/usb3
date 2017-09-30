@@ -1,0 +1,7 @@
+auto usb3
+
+allow-hotplug usb3
+iface usb3 inet manual
+        up ip link set usb3 up
+        up brctl addif br0 usb3
+
