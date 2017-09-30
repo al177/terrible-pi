@@ -5,3 +5,8 @@
 
 # Include files from /etc/network/interfaces.d:
 source-directory /etc/network/interfaces.d
+
+auto wlan0
+allow-hotplug wlan0
+iface wlan0 inet manual
+	wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
