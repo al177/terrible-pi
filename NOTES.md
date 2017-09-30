@@ -35,7 +35,7 @@ Some notes.
 		
 		-Boot the microSD on the Pi Zero W
 		
-		-After 2-3 minutes, try SSHing as "pi" to the Zero W with the hostname
+		-After 4-5 minutes, try SSHing as "pi" to the Zero W with the hostname
 			"raspberrypi", "raspberrypi.lan", or "raspberrypi.local".  Use the
 			password "raspberry".  If your router doesn't support Avahi, you
 			may have to check the router's DHCP lease logs to see what IP
@@ -49,8 +49,14 @@ sudo apt-get -y update && sudo apt-get -y upgrade
 
 		-Install the necessary packages:
 			
-sudo apt-get -y install libusb-1.0.0-dev nfs-kernel-server git\
+sudo apt-get -y install libusb-1.0-0-dev nfs-kernel-server git \
 pdsh isc-dhcp-server iptables bridge-utils
+
+		-Enable things that need enabling:
+
+sudo systemctl enable isc-dhcp-server
+sudo systemctl enable rpcbind
+sudo systemctl enable nfs-kernel-server
 
 		-Build and install the USB hub tool:
 
@@ -80,7 +86,8 @@ git clone https://github.com/al177/terrible-pi.git
 
 		-Copy the config files for the DHCP server, networks, NFS, SSH, and
 			hosts, hostname, and startup scripts:
-			
+
+sudo chown -R root:root /home/pi/terrible-pi/etc			
 sudo cp -a /home/pi/terrible-pi/etc/* /etc/.
 
 		-Reboot the head node.
@@ -103,7 +110,13 @@ chmod 700 /srv/pihome/.ssh
 
 ssh-keygen -t rsa -f /srv/pihome/.ssh/terrible.rsa -N ""
 cp /srv/pihome/.ssh/terrible.rsa.pub /srv/pihome/.ssh/authorized_keys
+chmod 600 /srv/pihome/.ssh/authorized_keys
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
 cp /srv/pihome/.ssh/terrible.rsa ~/.ssh/.
+
+
+		-Enable the DHCP server:
 
 
 -compute node image generation
@@ -121,9 +134,14 @@ sudo terrible-pi/nodeimg_build.sh 2017-09-07-raspbian-stretch-lite.zip
 	This will take 10-15 minutes.  The result will be a directory "tcboot"
 	that contains the boot files and filesystems for the nodes.
 
-	-Transfer the boot image to each node, looping over all nodes in series.
+	-Turn off all the nodes.  If the nodes all power up in bootstrap mode
+		simultaneously, the image transfer script won't work.
 
-for N in 1 2 3 4; do sudo terrible-pi/node_init.sh tcboot; done
+sudo uhubctl -r 4 -a off
+
+	-Transfer the SD filesystem to each node, looping over all nodes in series.
+
+for N in 1 2 3 4; do sudo terrible-pi/node_init.sh tcboot $N; done
 
 	This takes 5-10 minutes per node depending on the speed of the SD cards
 	on the compute node Pi Zeros.
@@ -140,9 +158,20 @@ sudo rpiboot -o -l -d /home/pi/tcboot
 sudo uhubctl -r 4 -a cycle
 
 	-The boot will take 2-3 minutes.  The nodes should be pingable once they are
-		done.  At this point it should be possible to SSH to the nodes by name
-		like this:
+		done.  
+
+	-Before SSHing to a node in any given session, start the key agent and add
+		the SSH key:
+
+eval `ssh-agent`
+ssh-add ~/.ssh/terrible.rsa
+
+
+	-SSH to a node by name:
 
 ssh node1
 
 
+	-Run a command on all nodes with pdsh:
+
+pdsh -R ssh -w node1,node2,node3,node4 hostname
