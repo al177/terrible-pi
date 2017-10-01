@@ -6,24 +6,24 @@ Setting up a terrible-pi cluster head node
 
 
 1. Get the latest Raspbian (https://downloads.raspberrypi.org/raspbian_lite_latest)
-and install to a microSD
+   and install to a microSD
    
 2. Mount the first (FAT)partition of the card on a PC.
 		
 3. Copy "wpa_supplicant.conf" from this repo to the card.  Edit it so that "YOUR_SSID"
-is replaced by the WiFi network name that you want the head node to connect to, and
-"YOUR_PASSPHRASE" is replaced by the network's key.  Use your Google-fu if you
-can't get it to work.
+   is replaced by the WiFi network name that you want the head node to connect to, and
+   "YOUR_PASSPHRASE" is replaced by the network's key.  Use your Google-fu if you
+   can't get it to work.
 		
 4. Create an empty file on the card named "ssh".  Use the UNIX command "touch ssh" or
-just open and save a new file "ssh" with your text editor.
+   just open and save a new file "ssh" with your text editor.
 		
 5. Boot the microSD on the Pi Zero W
 		
 6. After 4-5 minutes, try SSHing as "pi" to the Zero W with the hostname "raspberrypi",
-"raspberrypi.lan", or "raspberrypi.local".  Use the password "raspberry".  If your
-router isn't serving DNS for local domains, you may have to check the router's
-DHCP lease logs to see what IP the head node has.
+   "raspberrypi.lan", or "raspberrypi.local".  Use the password "raspberry".  If your
+   router isn't serving DNS for local domains, you may have to check the router's
+   DHCP lease logs to see what IP the head node has.
 		
 7. Now that you're logged into the Pi Zero W, update to the latest Raspbian packages:
 
@@ -99,7 +99,7 @@ chmod 700 /srv/pihome/.ssh
     use "head.lan", "head", or "head.local" when reconnecting.
 
 17. Make an empty passphrase SSH key so the head can automatically
-		connect to the nodes:
+    connect to the nodes:
 
 ```
 ssh-keygen -t rsa -f /srv/pihome/.ssh/terrible.rsa -N ""
@@ -122,7 +122,7 @@ Setting up terrible cluster compute nodes
 wget --trust-server-names https://downloads.raspberrypi.org/raspbian_lite_latest
 ```
 	 
-	 Note the filename that it downloads as.
+Note the filename that it downloads as.
 
 2. Prep the boot image:
 
@@ -130,21 +130,21 @@ wget --trust-server-names https://downloads.raspberrypi.org/raspbian_lite_latest
 sudo terrible-pi/nodeimg_build.sh 2017-09-07-raspbian-stretch-lite.zip
 ```
 	
-	This will take 10-15 minutes.  The result will be a directory "tcboot"
-	that contains the boot files and filesystems for the nodes.  This process
-	needs to be repeated only when changing or upgrading the Raspbian install on
-	the compute nodes.
+This will take 10-15 minutes.  The result will be a directory "tcboot"
+that contains the boot files and filesystems for the nodes.  This process
+needs to be repeated only when changing or upgrading the Raspbian install on
+the compute nodes.
 
 ### Deploying Raspbian to the compute nodes
 
 1. Insure that the microSD cards in nodes do not contain the Raspberry Pi
    bootloader, or the USB boot method used to manage this cluster will not work.
-	 Insure that "bootcode.bin" does not exist in the root of any of the
-	 partitions on any of the cards.  If in doubt, do a full erase on the SD card
-	 to wipe out the bootloader in any of the partitions.
+   Insure that "bootcode.bin" does not exist in the root of any of the
+   partitions on any of the cards.  If in doubt, do a full erase on the SD card
+   to wipe out the bootloader in any of the partitions.
 	 
 2. Turn off all the nodes.  If the nodes all power up in bootstrap mode
-	 simultaneously, the image transfer script won't work.
+   simultaneously, the image transfer script won't work.
 
 ```
 sudo uhubctl -r 4 -a off
@@ -156,8 +156,8 @@ sudo uhubctl -r 4 -a off
 for N in 1 2 3 4; do sudo terrible-pi/node_init.sh tcboot $N; done
 ```
 
-	This takes 5-10 minutes per node depending on the speed of the SD cards
-	on the compute node Pi Zeros.
+This takes 5-10 minutes per node depending on the speed of the SD cards
+on the compute node Pi Zeros.
 
 Terrible cluster management
 ---------------------------
@@ -183,7 +183,7 @@ done.
 ### Connecting to the nodes
 
 Before SSHing to a node in any given session, start the key agent and add
-		the SSH key:
+the SSH key:
 
 ```
 eval `ssh-agent`
