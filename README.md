@@ -237,4 +237,8 @@ pdsh -R ssh -w node1,node2,node3,node4 hostname
 
 
 
-All files in this tree are by Andrew Litt and licensed as [CC-BY-SA.](https://creativecommons.org/licenses/by-sa/4.0/)
+Raspberry Pi Zero 1.3 models
+[pi0computer.stl and pi0sdcard.stl](https://www.thingiverse.com/thing:2101674)
+are created by jdhorvat and licensed CC-BY-NC.  All other files in this tree
+are by Andrew Litt and licensed as 
+[CC-BY-SA.](https://creativecommons.org/licenses/by-sa/4.0/)
