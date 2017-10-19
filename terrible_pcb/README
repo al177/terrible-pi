@@ -1,6 +1,36 @@
 Hardware design for the Terrible Cluster.
 
-Still a work in progress.
+1) Backplane board
+
+terrible.pro is the KiCad project for the Terrible Cluster backplane board.  All components needed to create fabbable output are in this project, however due to license restrictions the 3D models needed to render the assembly are not included.
+
+Pre-built gerbers for the v0.1 release of the board are in the directory gerber_v0.1.  These are fab-ready and can be zipped and sent off as-is.
+
+terrible_v1_bom.csv is a CSV format BOM for the backplane.  It can be imported to a Digi-Key cart for convenience.  At the moment the microUSB B connector in the BOM is wrong for the footprint in the schematic, and I haven't yet identified the right p/n.
+
+After assembling the backplane, flush cut all of the through hole pins to under 1mm, or it may not fit in the case.
+
+2) Case
+
+terrible_case.scad is an OpenSCAD model for a 3D printed enclosure for the Terrible Cluster.  It is a single piece into which the backplane and Zero nodes can slide.  A 40mm x 40mm x 10mm 5V fan is friction-fit into the open end, and provides cooling for the cluster.  The cluster board assembly is held in place by a piece of 1.75mm filament fed through holes at the open side of the backplane PCB channel.
+
+terrible_case.stl is a printable file for the case rendered from terrible_case.scad.  This case is sensitive to printer tolerances, so if parts of the case print too tight or loose, it may be necessary to customize the SCAD file and regenerate the .stl.
+
+The fan is wired to the two pin power pads on the backplane.  A 2x1 0.1" right angle header can be soldered to the pads, and a matching plug attached to the fan leads if desired, or the fan can be soldered directly to the pads.  Care should be taken to reduce slack in the fan cable to prevent any loose wire from interfering with the fan.
+
+When sliding the cluster into the case, it may be necessary to move the Zeros side to side to get them to all fit in the slot cutouts.  It should not take much force to get the backplane to slide in all the way.
+
+After the cluster is in the case, feed a piece of 1.75mm filament through both holes towards the back of the case.  Use flush cutters to clip the filament even with the side of the case on both sides.  This will prevent the cluster from sliding backwards into the fan, especially when inserting a microUSB power cable.  To take apart the cluster, push the filament through with a paperclip and pull it out from the other side.
+
+The fan uses a friction fit to hold it in the back of the case.  Exact outer dimensions of these fans can vary slightly, so the fan cutout is intentionally slightly oversized.  Use a piece of folded paper or layers of tape on one side of the fan as a shim to secure the fan.
+
+The SCAD file can render the case alone in an orientation for printing, or render the case along with a model of the cluster and the fan to show the finished cluster.  Set "PRODUCTION=true" near the top of the SCAD to render for printing, and "PRODUCTION=false" to render the internal parts as well.
+
+3) Cluster model
+
+terrible.scad is an OpenSCAD model of the backplane board and the Raspberry Pi Zeros.  It is used as part of the case model for checking fitment and to render a completed Terrible Cluster.  Load it into OpenSCAD on its own to render the cluster boards.
+
+
 
 Attributions:
 

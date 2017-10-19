@@ -16,7 +16,7 @@ Up to date news on this project can be found at [this Hackaday project.]
 
 Repo Contents
 -------------
-The terrible_pcb directory has a board design for the backplane.
+The terrible_pcb directory has a board design for the backplane and a 3D printable case.  See terrible_pcb/README for instructions for printing the case and the backplane board.
 
 `etc` contains config files to be copied on top of the Raspbian install for
 the head node.
