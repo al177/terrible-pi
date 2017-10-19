@@ -83,7 +83,7 @@ popd
 10. Build and install the USB boot tool:
 	
 ```
-git clone https://github.com/burtyb/usbboot.git
+git clone https://github.com/raspberrypi/usbboot.git
 pushd usbboot
 make
 sudo cp rpiboot /usr/local/bin/.
