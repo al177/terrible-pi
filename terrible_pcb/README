@@ -6,7 +6,13 @@ terrible.pro is the KiCad project for the Terrible Cluster backplane board.  All
 
 Pre-built gerbers for the v0.1 release of the board are in the directory gerber_v0.1.  These are fab-ready and can be zipped and sent off as-is.
 
-terrible_v1_bom.csv is a CSV format BOM for the backplane.  It can be imported to a Digi-Key cart for convenience.  At the moment the microUSB B connector in the BOM is wrong for the footprint in the schematic, and I haven't yet identified the right p/n.
+terrible_v1a_bom.csv is a CSV format BOM for the backplane.  It can be imported to a Digi-Key cart for convenience.
+
+BOM history
+-----------
+v1  - Initial BOM for PCB v0.1
+v1a - Corrected microUSB B to match the current footprint, add insulator
+      spacer for crystal Y1
 
 After assembling the backplane, flush cut all of the through hole pins to under 1mm, or it may not fit in the case.
 
