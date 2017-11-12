@@ -67,7 +67,7 @@ sudo apt-get -y update && sudo apt-get -y upgrade
 			
 ```
 sudo apt-get -y install libusb-1.0-0-dev nfs-kernel-server git \
-pdsh isc-dhcp-server iptables bridge-utils
+pdsh udhcpd iptables bridge-utils
 ```
 9. Build and install the USB hub tool:
 
@@ -83,7 +83,7 @@ popd
 10. Build and install the USB boot tool:
 	
 ```
-git clone https://github.com/burtyb/usbboot.git
+git clone https://github.com/raspberrypi/usbboot.git
 pushd usbboot
 make
 sudo cp rpiboot /usr/local/bin/.
@@ -109,7 +109,7 @@ sudo cp -a /home/pi/terrible-pi/etc/* /etc/.
 13. Enable necessary services:
 
 ```
-sudo systemctl enable isc-dhcp-server
+sudo systemctl enable udhcpd
 sudo systemctl enable rpcbind
 sudo systemctl enable nfs-kernel-server
 ```
