@@ -1,4 +1,9 @@
 # terrible-pi
+
+
+
+![](https://i.imgur.com/5njScmk.jpg) ![](https://i.imgur.com/kaebvPF.jpg)
+
 *A supercomputer, but fun sized. And not super.*
 
 In this repo you'll find hardware designs for the Terrible-Pi, a cluster
