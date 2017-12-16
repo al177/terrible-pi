@@ -10,8 +10,7 @@ all five Pi Zeros and allows the head node to control power to each of the
 compute nodes.  The USB boot feature of the Pi Zero is used to automate
 deployment of new OS images to each compute node.
 
-Up to date news on this project can be found at [this Hackaday project.]
-(https://hackaday.io/project/27142-terrible-cluster)
+Up to date news on this project can be found at [this Hackaday project.](https://hackaday.io/project/27142-terrible-cluster)
 
 
 Repo Contents
@@ -39,7 +38,7 @@ Setting up a terrible-pi cluster head node
 1. Get the latest Raspbian (https://downloads.raspberrypi.org/raspbian_lite_latest)
    and install to a microSD
    
-2. Mount the first (FAT)partition of the card on a PC.
+2. Mount the first (FAT) partition of the card on a PC.
 		
 3. Copy "wpa_supplicant.conf" from this repo to the card.  Edit it so that
    "YOUR_SSID" is replaced by the WiFi network name that you want the head node
