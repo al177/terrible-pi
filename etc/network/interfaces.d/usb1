@@ -4,4 +4,4 @@ allow-hotplug usb1
 iface usb1 inet manual
         up ip link set usb1 up
         up brctl addif br0 usb1
-
+	post-up ifconfig usb1 mtu 9000
