@@ -102,7 +102,7 @@ echo '    IdentityFile /srv/pihome/.ssh/terrible.rsa' >> $ROOT/etc/ssh/ssh_confi
 echo 'auto usb0' > $ROOT/etc/network/interfaces.d/usb0
 echo 'allow-hotplug usb0' >> $ROOT/etc/network/interfaces.d/usb0
 echo '    iface usb0 inet dhcp' >> $ROOT/etc/network/interfaces.d/usb0
-echo '    post-up ifconfig usb0 mtu 9000'  >> $ROOT/etc/network/interfaces.d/usb0
+echo '    post-up ifconfig usb0 mtu 15000'  >> $ROOT/etc/network/interfaces.d/usb0
 
 # add hostnames for all nodes to the node hosts file
 for N in 1 2 3 4; do

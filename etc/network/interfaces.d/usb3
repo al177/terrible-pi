@@ -4,4 +4,4 @@ allow-hotplug usb3
 iface usb3 inet manual
         up ip link set usb3 up
         up brctl addif br0 usb3
-	post-up ifconfig usb3 mtu 9000
+	post-up ifconfig usb3 mtu 15000
