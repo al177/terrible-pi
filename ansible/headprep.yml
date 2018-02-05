@@ -1,0 +1,102 @@
+---
+- name: start
+  hosts: newhead
+  become_method: sudo
+  become_user: root
+  become: yes
+  tasks:
+      - name: Update distro
+        apt:
+            upgrade: dist
+            update_cache: yes
+      - name: Install prereqs
+        apt:
+            pkg={{item}}
+            state=installed
+        with_items:
+            - libusb-1.0-0-dev
+            - nfs-kernel-server
+            - git
+            - pdsh
+            - udhcpd
+            - iptables
+            - bridge-utils
+      - name: Check out rpiboot
+        git:
+            repo: 'https://github.com/raspberrypi/usbboot.git'
+            dest: /home/pi/usbboot
+      - name: Build rpiboot
+        make:
+            chdir: /home/pi/usbboot
+      - name: Check out uhubctl
+        git:
+            repo: 'https://github.com/mvp/uhubctl.git'
+            dest: /home/pi/uhubctl
+      - name: Build uhubctl
+        make:
+            chdir: /home/pi/uhubctl
+      - name: Copy config files
+        copy:
+            src: 'files/headetc/'
+            dest: /etc
+            owner: root
+      - name: Enable udhcpd
+        systemd:
+            name: udhcpd
+            enabled: yes
+      - name: Enable rpcbind
+        systemd:
+            name: rpcbind
+            enabled: yes
+      - name: Enable nfs-kernel-server
+        systemd:
+            name: nfs-kernel-server
+            enabled: yes
+      - name: Make NFS path
+        file:
+            path: /srv/pihome
+            state: directory
+            owner: pi
+            group: pi
+            mode: 0755
+      - name: Make cluster SSH dir
+        file:
+            path: /srv/pihome/.ssh
+            state: directory
+            owner: pi
+            group: pi
+            mode: 0700
+      - name: Make SSH keys
+        shell: ssh-keygen -t rsa -f /srv/pihome/.ssh/terrible.rsa -N ""
+        args:
+            creates: /srv/pihome/.ssh/terrible.rsa
+        become: yes
+        become_user: pi
+      - name: Fix permissions on SSH keyfile
+        file:
+            path: /srv/pihome/.ssh/terrible.rsa
+            state: file
+            owner: pi
+            group: pi
+            mode: 0600
+      - name: Make pi user SSH dir
+        file:
+            path: /home/pi/.ssh
+            state: directory
+            owner: pi
+            group: pi
+            mode: 0700
+      - name: Copy keyfile to home dir
+        shell: cp /srv/pihome/.ssh/terrible.rsa /home/pi/.ssh/
+        args:
+            creates: /home/pi/.ssh/terrible.rsa
+        become: yes
+        become_user: pi
+      - name: Reboot
+        shell: sleep 2 && /sbin/shutdown -r now
+        async: 1
+        poll: 0
+        ignore_errors: true
+      - name: Wait for reboot to complete
+        local_action: wait_for host={{ ansible_ssh_host }} state=started delay=60 timeout=120
+        become: false
