@@ -1,0 +1,90 @@
+---
+- name: start
+  hosts: head
+  tasks:
+      - name: Make boot dir
+        file:
+            path: /home/pi/tcboot
+            state: directory
+            owner: pi
+            group: pi
+            mode: 0755
+      - name: Make root dir
+        file:
+            path: /home/pi/tcboot/root
+            state: directory
+            owner: root
+            group: root
+            mode: 0755
+        become: yes
+        become_user: root
+      - name: Make copy of the running root
+        shell: 'rsync -aAXv / --exclude "/dev/*" --exclude "/proc/*" --exclude "/sys/*" --exclude "/tmp/*" --exclude "/run/*" --exclude "/mnt/*" --exclude "/media/*" --exclude "/lost+found" --exclude "/home/pi/*" --exclude "/boot/*" /home/pi/tcboot/root'
+        args:
+            creates: /home/pi/tcboot/root/tmp
+        become: yes
+        become_user: root
+      - name: Fix up hosts file
+        replace:
+            dest: /home/pi/tcboot/root/etc/hosts
+            regexp: '^127\.0\.1\.1.*head'
+            replace: '10.0.0.1 head'
+        become: yes
+        become_user: root
+      - name: Remove unnecessary network devices
+        file:
+            path: "{{ item }}"
+            state: absent
+        with_items:
+            - /home/pi/tcboot/root/etc/network/interfaces.d/br0
+            - /home/pi/tcboot/root/etc/network/interfaces.d/usb0
+            - /home/pi/tcboot/root/etc/network/interfaces.d/usb1
+            - /home/pi/tcboot/root/etc/network/interfaces.d/usb2
+            - /home/pi/tcboot/root/etc/network/interfaces.d/usb3
+        become: yes
+        become_user: root
+      - name: Copy proper usb0 network device config
+        copy:
+            src: 'files/node/usb0'
+            dest: /home/pi/tcboot/root/etc/network/interfaces.d/
+            owner: root
+        become: yes
+        become_user: root
+      - name: Set up home dir NFS mount
+        lineinfile:
+            dest: /home/pi/tcboot/root/etc/fstab
+            line: 'head:/srv/pihome /home/pi       nfs defaults,noatime,nolock,x-systemd.automount 0 0'
+        become: yes
+        become_user: root
+
+      - name: Make LED show heartbeat
+        lineinfile:
+            dest: /home/pi/tcboot/root/etc/rc.local
+            insertbefore: '^exit 0'
+            line: 'echo heartbeat > /sys/class/leds/led0/trigger'
+        become: yes
+        become_user: root
+
+      - name: Disable HDMI on boot
+        lineinfile:
+            dest: /home/pi/tcboot/root/etc/rc.local
+            insertbefore: '^exit 0'
+            line: '/usr/bin/tvservice -o'
+        become: yes
+        become_user: root
+
+      - name: Convert fstab to mmcblk partitions
+        replace:
+            dest: /home/pi/tcboot/root/etc/fstab
+            regexp: 'PARTUUID=[0-9a-z]*-0(.*)'
+            replace: '/dev/mmcblk0p'
+        become: yes
+        become_user: root
+      - name: Tar up the root
+        shell: tar -cp -C /home/pi/tcboot/root . | gzip -1 > /home/pi/tcboot/rootfs.tar.gz
+        args:
+            creates: /home/pi/tcboot/rootfs.tar.gz
+        become: yes
+        become_user: root
+
+

@@ -59,3 +59,8 @@ Host "node?"
     UserKnownHostsFile /dev/null
     IdentityFile /srv/pihome/.ssh/terrible.rsa
 
+Host "head"
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+    IdentityFile /srv/pihome/.ssh/terrible.rsa
+

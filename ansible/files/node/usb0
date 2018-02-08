@@ -1,0 +1,5 @@
+auto usb0
+
+allow-hotplug usb0
+iface usb0 inet dhcp
+	post-up ifconfig usb0 mtu 15000
