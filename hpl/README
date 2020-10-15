@@ -1,0 +1,9 @@
+Uses hpl-2.2 sources
+
+Unpack tarball into /srv/pihome
+
+ln -s /srv/pihome/hpl-2.2 /home/mythicuser/hpl-2.2
+
+Build with 'Make.rpi' makefile
+
+Copy HPL.dat, run_hpl, and nodes to /srv/pihome/hpl-2.2/bin/rpi
