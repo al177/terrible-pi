@@ -1,9 +1,26 @@
-Uses hpl-2.2 sources
+Uses hpl-2.2 sources: https://www.netlib.org/benchmark/hpl/hpl-2.2.tar.gz
+
 
 Unpack tarball into /srv/pihome
 
 ln -s /srv/pihome/hpl-2.2 /home/mythicuser/hpl-2.2
 
-Build with 'Make.rpi' makefile
+sudo apt -y install libatlas-base-dev libmpich-dev libmpich2-3 gfortran libopenblas-dev 
+
+Build with 'Make.rpi' makefile:
+cp /home/pi/terrible_pi/hpl/Make.rpi .
+cd setup
+make generic
+cd ..
+make arch=rpi
+cd bin/rpi
+cp /home/pi/terrible_pi/hpl/run_hpl .
+cp /home/pi/terrible_pi/hpl/nodes .
+cp /home/pi/terrible_pi/hpl/HPL.dat .
+cd
 
 Copy HPL.dat, run_hpl, and nodes to /srv/pihome/hpl-2.2/bin/rpi
+
+Boot all nodes, then:
+	pdsh -R ssh -w node[1-4] "sudo apt install mpich"
+

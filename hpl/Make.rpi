@@ -81,7 +81,7 @@ HPLlib       = $(LIBdir)/libhpl.a
 # header files,  MPlib  is defined  to be the name of  the library to be 
 # used. The variable MPdir is only used for defining MPinc and MPlib.
 #
-MPdir        = 
+MPdir        =
 MPinc        = 
 MPlib        = -lmpi
 #
@@ -89,10 +89,10 @@ MPlib        = -lmpi
 # - Linear Algebra library (BLAS or VSIPL) -----------------------------
 # ----------------------------------------------------------------------
 # LAinc tells the  C  compiler where to find the Linear Algebra  library
-# header files,  LAlib  is defined  to be the name of  the library to be 
+# header files,  LAlib  is defined  to be the name of  the library to be
 # used. The variable LAdir is only used for defining LAinc and LAlib.
 #
-LAdir        = /usr/lib
+LAdir        = /usr/lib/arm-linux-gnueabihf
 LAinc        = 
 LAlib        = $(LAdir)/libopenblas.a -lpthread
 #
@@ -111,7 +111,7 @@ LAlib        = $(LAdir)/libopenblas.a -lpthread
 #                       Intel, ...),                           [default]
 # -DNoChange          : all lower case (IBM RS6000),
 # -DUpCase            : all upper case (Cray),
-# -DAdd__             : the FORTRAN compiler in use is f2c.
+# -DAdd__             : the FORTRuAN compiler in use is f2c.
 #
 # 2) C and Fortran 77 integer mapping
 #
@@ -168,7 +168,8 @@ HPL_DEFS     = $(F2CDEFS) $(HPL_OPTS) $(HPL_INCLUDES)
 #
 CC           = mpicc
 CCNOOPT      = $(HPL_DEFS) 
-CCFLAGS      = $(HPL_DEFS) -fomit-frame-pointer -O3 -funroll-loops -W -Wall
+#CCFLAGS      = $(HPL_DEFS) -fomit-frame-pointer -O3 -funroll-loops -W -Wall
+CCFLAGS      = $(HPL_DEFS) -O3 -W -Wall
 #
 LINKER       = mpicc
 LINKFLAGS    = $(CCFLAGS)

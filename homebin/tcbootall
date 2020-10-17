@@ -1,12 +1,23 @@
 #!/bin/bash
 cnodes=4
 max_tries=20
-
-sudo /home/pi/uhubctl/uhubctl -r 4 -a cycle
-sudo rpiboot -o -l -d /home/pi/tcboot > /tmp/tcboot.log 2>&1 &
+sudo killall rpiboot
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -R -r 4 -w 500 -a on
+sleep 2
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -r 4 -w 500 -a off
+sleep 2
+sudo rpiboot -o -l -m 10000 -v -d /home/pi/tcboot > /tmp/tcboot.log 2>&1 &
 rpiboot_pid=$!
 echo "rpiboot started, pid $rpiboot_pid.  Log in /tmp/tcboot.log"
 echo "Wait for nodes to boot..."
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -r 4 -w 500 -a on -p 1
+sleep 20
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -r 4 -w 500 -a on -p 2
+sleep 20
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -r 4 -w 500 -a on -p 3
+sleep 20
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -r 4 -w 500 -a on -p 4
+sleep 20
 tries=1
 num_alive=0
 while [ $num_alive -lt $cnodes ] && [ $tries -le $max_tries ]; do
@@ -14,6 +25,7 @@ while [ $num_alive -lt $cnodes ] && [ $tries -le $max_tries ]; do
 	echo -n "Try $tries : "
 	num_alive=`pdsh -R ssh -w node[1-4] hostname 2>/dev/null | grep -e "^node" | wc -l`
 	echo " $num_alive responding"
+	sudo /home/pi/uhubctl/uhubctl -l 1-1
 	tries=$(( tries + 1 ))
 done
 

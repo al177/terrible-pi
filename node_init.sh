@@ -1,9 +1,9 @@
 #!/bin/bash
-
+set -e
 BOOTDIR_PATH=`readlink -f $1`
 NODE=$2
 
-UHUBCTL=uhubctl
+UHUBCTL="uhubctl -l 1-1"
 RPIBOOT=rpiboot
 
 
@@ -34,7 +34,7 @@ $RPIBOOT
 
 sleep 10
 
-DISKDEV=`ls -1 /dev/disk/by-path/*usb-*.${NODE}*:0`
+DISKDEV=`ls -1 /dev/disk/by-path/*usb-[0-9]:[0-9].${NODE}*:0`
 echo "---Checking ${DISKDEV}"
 
 if [ ! -L $DISKDEV ]; then
@@ -42,7 +42,7 @@ if [ ! -L $DISKDEV ]; then
 	exit 255
 fi
 
-echo -e ",85622,0xC\n,+,L" | sfdisk $DISKDEV
+echo -e ",524288,0xC\n,+,L" | sfdisk $DISKDEV
 sync
 
 # tell the kernel that the partitions have changed
@@ -51,6 +51,7 @@ partx ${DISKDEV}
 # need to wait for the symlinks to update
 sleep 10
 sfdisk -l $DISKDEV
+sleep 1
 ls -l /dev/disk/by-path
 
 mkdosfs ${DISKDEV}-part1

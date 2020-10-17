@@ -78,6 +78,8 @@ done
 
 rm $BOOTDIR/cmdline.txt
 rm $BOOTDIR/config.txt
+# Use bootcode.bin from the rpiboot distribution
+rm $BOOTDIR/bootcode.bin
 
 
 echo "---Fixing up root and boot contents"
@@ -123,8 +125,8 @@ sed -i -e "$ i echo heartbeat > /sys/class/leds/led0/trigger" $ROOT/etc/rc.local
 sed -i -e "s/PARTUUID=[^ \t]*\([12][ \t]\)/\/dev\/mmcblk0p\1/g" $ROOT/etc/fstab
 
 echo "---Tarring up the filesystems"
-tar -cp -C $ROOT . | gzip -1 - > $BOOTDIR/rootfs.tar.gz 
-tar -cp -C $BOOT . | gzip -1 - > $BOOTDIR/bootfs.tar.gz 
+tar -czp -C $ROOT -f $BOOTDIR/rootfs.tar.gz .
+tar -czp -C $BOOT -f $BOOTDIR/bootfs.tar.gz .
 
 echo "---Fixing perms for the boot dir"
 chown -R pi $BOOTDIR
