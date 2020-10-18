@@ -1,0 +1,3 @@
+#!/bin/bash
+arp -na | grep 68:08
+pdsh -R ssh -w node[1-4] hostname
