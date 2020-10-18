@@ -67,7 +67,7 @@ ARCH         = rpi
 # - HPL Directory Structure / HPL library ------------------------------
 # ----------------------------------------------------------------------
 #
-TOPdir       = /srv/pihome/hpl-2.2
+TOPdir       = /srv/pihome/hpl
 INCdir       = $(TOPdir)/include
 BINdir       = $(TOPdir)/bin/$(ARCH)
 LIBdir       = $(TOPdir)/lib/$(ARCH)

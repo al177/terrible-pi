@@ -10,14 +10,14 @@ sudo rpiboot -o -l -m 10000 -v -d /home/pi/tcboot > /tmp/tcboot.log 2>&1 &
 rpiboot_pid=$!
 echo "rpiboot started, pid $rpiboot_pid.  Log in /tmp/tcboot.log"
 echo "Wait for nodes to boot..."
-sudo /home/pi/uhubctl/uhubctl -l 1-1 -r 4 -w 500 -a on -p 1
-sleep 20
-sudo /home/pi/uhubctl/uhubctl -l 1-1 -r 4 -w 500 -a on -p 2
-sleep 20
-sudo /home/pi/uhubctl/uhubctl -l 1-1 -r 4 -w 500 -a on -p 3
-sleep 20
-sudo /home/pi/uhubctl/uhubctl -l 1-1 -r 4 -w 500 -a on -p 4
-sleep 20
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -w 1000 -a on -p 1
+sleep 30
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -w 1000 -a on -p 2
+sleep 30
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -w 1000 -a on -p 3
+sleep 30
+sudo /home/pi/uhubctl/uhubctl -l 1-1 -w 1000 -a on -p 4
+sleep 30
 tries=1
 num_alive=0
 while [ $num_alive -lt $cnodes ] && [ $tries -le $max_tries ]; do

@@ -3,14 +3,20 @@ Uses hpl-2.2 sources: https://www.netlib.org/benchmark/hpl/hpl-2.2.tar.gz
 
 Unpack tarball into /srv/pihome
 
-ln -s /srv/pihome/hpl-2.2 /home/mythicuser/hpl-2.2
+ln -s /srv/pihome/hpl /home/pi/hpl
 
-sudo apt -y install libatlas-base-dev libmpich-dev libmpich2-3 gfortran libopenblas-dev 
+sudo apt -y install gfortran libopenblas-dev automake openmpi-bin libopenmpi-dev
+
+Download atlas:
+https://downloads.sourceforge.net/project/math-atlas/Stable/3.10.3/atlas3.10.3.tar.bz2
+
 
 Build with 'Make.rpi' makefile:
+mv hpl-2.3 hpl
+cd hpl
 cp /home/pi/terrible_pi/hpl/Make.rpi .
 cd setup
-make generic
+sh make_generic
 cd ..
 make arch=rpi
 cd bin/rpi
@@ -19,8 +25,8 @@ cp /home/pi/terrible_pi/hpl/nodes .
 cp /home/pi/terrible_pi/hpl/HPL.dat .
 cd
 
-Copy HPL.dat, run_hpl, and nodes to /srv/pihome/hpl-2.2/bin/rpi
+Copy HPL.dat, run_hpl, and nodes to /srv/pihome/hpl/bin/rpi
 
 Boot all nodes, then:
-	pdsh -R ssh -w node[1-4] "sudo apt install mpich"
+	pdsh -R ssh -w node[1-4] "sudo apt install openmpi-bin libopenmpi-dev"
 

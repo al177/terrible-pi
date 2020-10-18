@@ -2,5 +2,5 @@
 prep_cmd="sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches; grep MemAv /proc/meminfo'"
 eval $prep_cmd
 pdsh -R ssh -w node[1-4] $prep_cmd
-nohup mpiexec -f nodes ./xhpl >hpl.log 2>&1 &
+nohup mpiexec --hostfile nodes ./xhpl >hpl.log 2>&1 &
 echo "Started xhpl, log is hpl.log"
