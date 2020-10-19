@@ -1,5 +1,5 @@
 #!/bin/bash
-prep_cmd="sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches; grep MemAv /proc/meminfo'"
+prep_cmd="sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches; grep MemAv /proc/meminfo; echo performance | tee /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor '"
 eval $prep_cmd
 pdsh -R ssh -w node[1-4] $prep_cmd
 nohup mpiexec --hostfile nodes ./xhpl >hpl.log 2>&1 &
