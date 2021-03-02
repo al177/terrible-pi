@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo rpiboot -o -l -d /home/pi/tcboot

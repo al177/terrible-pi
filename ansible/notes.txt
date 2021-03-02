@@ -1,1 +1,2 @@
+On server:
 apt-get install ansible python-jinja2 sshpass

@@ -1,0 +1,14 @@
+#!/bin/bash
+cnodes=4
+max_tries=20
+echo "Wait for nodes to boot..."
+tries=1
+num_alive=0
+while [ $num_alive -lt $cnodes ] && [ $tries -le $max_tries ]; do
+	sleep 10
+	echo -n "Try $tries : "
+	num_alive=`pdsh -R ssh -w node[1-4] hostname 2>/dev/null | grep -e "^node" | wc -l`
+	echo " $num_alive responding"
+	tries=$(( tries + 1 ))
+done
+

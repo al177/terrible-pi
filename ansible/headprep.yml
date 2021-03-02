@@ -5,14 +5,17 @@
   become_user: root
   become: yes
   tasks:
+      - name: Update cache
+        apt:
+          update_cache: yes
+          cache_valid_time: 86400
       - name: Update distro
         apt:
-            upgrade: dist
-            update_cache: yes
+          upgrade: dist
       - name: Install prereqs
         apt:
-            pkg={{item}}
-            state=installed
+          pkg: "{{item}}"
+          state: latest
         with_items:
             - libusb-1.0-0-dev
             - nfs-kernel-server
@@ -23,23 +26,58 @@
             - bridge-utils
       - name: Check out rpiboot
         git:
-            repo: 'https://github.com/raspberrypi/usbboot.git'
-            dest: /home/pi/usbboot
+          repo: 'https://github.com/raspberrypi/usbboot.git'
+          dest: /home/pi/usbboot
       - name: Build rpiboot
         make:
-            chdir: /home/pi/usbboot
+          chdir: /home/pi/usbboot
       - name: Check out uhubctl
         git:
-            repo: 'https://github.com/mvp/uhubctl.git'
-            dest: /home/pi/uhubctl
+          repo: 'https://github.com/mvp/uhubctl.git'
+          dest: /home/pi/uhubctl
       - name: Build uhubctl
         make:
-            chdir: /home/pi/uhubctl
+          chdir: /home/pi/uhubctl
+      - name: Install uhubctl and rpiboot executables
+        copy:
+          src: "{{item.src}}"
+          dest: "{{item.dest}}"
+          remote_src: true
+          owner: root
+          mode: 0755
+        with_items:
+          - { src: '/home/pi/uhubctl/uhubctl', dest: '/usr/local/bin/uhubctl' }
+          - { src: '/home/pi/usbboot/rpiboot', dest: '/usr/local/bin/rpiboot' }
+        become: true
+      - name: Make rpiboot support directory
+        file: 
+          path: '/usr/share/rpiboot/msd'
+          recurse: yes
+          state: directory
+      - name: Install rpiboot support files
+        copy:
+          src: "{{item.src}}"
+          dest: "{{item.dest}}"
+          remote_src: true
+          owner: root
+          mode: 0644
+        with_items:
+          - { src: '/home/pi/usbboot/msd/bootcode.bin', dest: '/usr/share/rpiboot/msd/bootcode.bin' }
+          - { src: '/home/pi/usbboot/msd/bootcode.h', dest: '/usr/share/rpiboot/msd/bootcode.h' }
+          - { src: '/home/pi/usbboot/msd/start.elf', dest: '/usr/share/rpiboot/msd/start.elf' }
+          - { src: '/home/pi/usbboot/msd/start.h', dest: '/usr/share/rpiboot/msd/start.h' }
       - name: Copy config files
         copy:
             src: 'files/headetc/'
             dest: /etc
             owner: root
+      - name: Copy /home/pi/bin files
+        copy:
+            src: 'files/homebin/'
+            dest: /home/pi/bin
+            owner: pi
+            group: pi
+            mode: 0755
       - name: Enable udhcpd
         systemd:
             name: udhcpd
@@ -59,13 +97,16 @@
             owner: pi
             group: pi
             mode: 0755
-      - name: Make cluster SSH dir
+      - name: Make SSH dirs
         file:
-            path: /srv/pihome/.ssh
+            path: "{{item}}"
             state: directory
             owner: pi
             group: pi
             mode: 0700
+        with_items:
+          - '/srv/pihome/.ssh'
+          - '/home/pi/.ssh' 
       - name: Make SSH keys
         shell: ssh-keygen -t rsa -f /srv/pihome/.ssh/terrible.rsa -N ""
         args:
@@ -79,19 +120,19 @@
             owner: pi
             group: pi
             mode: 0600
-      - name: Make pi user SSH dir
-        file:
-            path: /home/pi/.ssh
-            state: directory
-            owner: pi
-            group: pi
-            mode: 0700
-      - name: Copy keyfile to home dir
-        shell: cp /srv/pihome/.ssh/terrible.rsa /home/pi/.ssh/
-        args:
-            creates: /home/pi/.ssh/terrible.rsa
-        become: yes
-        become_user: pi
+      - name: Distribute ssh keyfiles
+        copy:
+          src: "{{item.src}}"
+          dest: "{{item.dest}}"
+          mode: "{{item.mode}}"
+          remote_src: true
+          owner: pi
+          group: pi
+        with_items:
+          - { src: '/srv/pihome/.ssh/terrible.rsa.pub', dest: '/srv/pihome/.ssh/authorized_keys', mode: '0644' }
+          - { src: '/srv/pihome/.ssh/terrible.rsa.pub', dest: '/home/pi/.ssh/authorized_keys', mode: '0644' }
+          - { src: '/srv/pihome/.ssh/terrible.rsa.pub', dest: '/home/pi/.ssh/', mode: '0644' }
+          - { src: '/srv/pihome/.ssh/terrible.rsa', dest: '/home/pi/.ssh/', mode: '0600' }
       - name: Reboot
         shell: sleep 2 && /sbin/shutdown -r now
         async: 1

@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo /home/pi/uhubctl/uhubctl -r 4 -a cycle
