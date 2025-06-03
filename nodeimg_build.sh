@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 IMGLOOP=""
 BOOTPART=""
@@ -14,7 +15,7 @@ function unmount_cleanup()
 	rmdir $ROOT
 	rmdir $BOOT
 	losetup -d $IMGLOOP
-	rm $IMGFILE
+	#rm $IMGFILE
 }
 
 if [ -z "$1" ]; then
@@ -22,10 +23,13 @@ if [ -z "$1" ]; then
 	exit 255
 fi
 
-unzip -o $1
-IMGBASENAME=`sed -e "s/\.zip//g" <<< "$1"`
-
+IMGBASENAME=`sed -e "s/\.img\.xz//g" <<< "$1"`
 IMGFILE="${IMGBASENAME}.img"
+if [ ! -e ${IMGFILE} ]; then
+	echo "unpacking ${IMGFILE}"
+	xzcat $1 > ${IMGFILE}
+fi
+
 BOOTDIR="tcboot"
 rm -rf $BOOTDIR
 mkdir $BOOTDIR
@@ -58,8 +62,8 @@ if [ ! -e $ROOTPART ]; then
 	exit 255
 fi
 
-mkdir $BOOT
-mkdir $ROOT
+mkdir -p $BOOT
+mkdir -p $ROOT
 mount $BOOTPART $BOOT
 mount $ROOTPART $ROOT
 
@@ -76,31 +80,38 @@ for F in 1 2 3 4; do
 	echo "dtoverlay=dwc2" >> $BOOTDIR/1-1.$F/config.txt
 done
 
+ls $BOOTDIR
 rm $BOOTDIR/cmdline.txt
 rm $BOOTDIR/config.txt
 # Use bootcode.bin from the rpiboot distribution
-rm $BOOTDIR/bootcode.bin
+rm $BOOTDIR/bootcode.bin || true
 
 
 echo "---Fixing up root and boot contents"
 # clean out the first stage bootloader so we don't accidentally boot
 # from SD
-rm $BOOT/bootcode.bin
+ls $BOOT
+rm $BOOT/bootcode.bin || true
 
 # enable SSH
 touch $BOOT/ssh
+
+# preconfigure user
+echo -n "$( whoami ):" > $BOOT/userconf.txt
+openssl passwd -6 "terrible" >> $BOOT/userconf.txt
 
 # disable host key checking for the nodes
 echo 'Host "node?"' >> $ROOT/etc/ssh/ssh_config
 echo '    StrictHostKeyChecking no' >> $ROOT/etc/ssh/ssh_config
 echo '    UserKnownHostsFile /dev/null' >> $ROOT/etc/ssh/ssh_config
 echo '    IdentityFile /srv/pihome/.ssh/terrible.rsa' >> $ROOT/etc/ssh/ssh_config
-echo 'Host "head"' >> $ROOT/etc/ssh/ssh_config
+echo "Host \"$( hostname )\"" >> $ROOT/etc/ssh/ssh_config
 echo '    StrictHostKeyChecking no' >> $ROOT/etc/ssh/ssh_config
 echo '    UserKnownHostsFile /dev/null' >> $ROOT/etc/ssh/ssh_config
 echo '    IdentityFile /srv/pihome/.ssh/terrible.rsa' >> $ROOT/etc/ssh/ssh_config
 
 # set jumbo frames on the USB network interface
+mkdir -p $ROOT/etc/network/interfaces.d
 echo 'auto usb0' > $ROOT/etc/network/interfaces.d/usb0
 echo 'allow-hotplug usb0' >> $ROOT/etc/network/interfaces.d/usb0
 echo '    iface usb0 inet dhcp' >> $ROOT/etc/network/interfaces.d/usb0
@@ -110,11 +121,12 @@ echo '    post-up ifconfig usb0 mtu 15000'  >> $ROOT/etc/network/interfaces.d/us
 for N in 1 2 3 4; do
 	echo "10.1.1.10${N}	node${N}" >> $ROOT/etc/hosts
 done
-echo "10.1.1.1	head" >> $ROOT/etc/hosts
+echo "10.1.1.1	`hostname`" >> $ROOT/etc/hosts
 
 # set up home dir nfs mount
-echo "head:/srv/pihome /home/pi       nfs defaults,noatime,nolock,x-systemd.automount 0 0" >> $ROOT/etc/fstab
+echo "head:/srv/pihome /home/$( whoami )       nfs defaults,noatime,nolock,x-systemd.automount 0 0" >> $ROOT/etc/fstab
 
+touch $ROOT/etc/rc.local
 # disable HDMI on boot
 sed -i -e "$ i /usr/bin/tvservice -o" $ROOT/etc/rc.local
 
@@ -129,6 +141,6 @@ tar -czp -C $ROOT -f $BOOTDIR/rootfs.tar.gz .
 tar -czp -C $BOOT -f $BOOTDIR/bootfs.tar.gz .
 
 echo "---Fixing perms for the boot dir"
-chown -R pi $BOOTDIR
+chown -R $( whoami ) $BOOTDIR
 
 unmount_cleanup
